@@ -4,66 +4,68 @@ import java.util.Collection;
 import java.util.Map;
 
 public class ObjectUtils {
+
     /**
      * Check if the specified Boolean is empty or not.
-     * @param in
+     *
+     * @param pIn
      * @return
      */
-    public static final boolean isObjectEmpty(final Boolean in) {
-        return in == null;
+    public static boolean isObjectEmpty(Boolean pIn) {
+        return pIn == null;
     }
 
     /**
      * Check if the specified Collection is empty or not.
-     * @param in
+     *
+     * @param pIn
      * @return
      */
-    public static final boolean isObjectEmpty(final Collection in) {
-        return (in == null) || (in.size() == 0);
+    public static boolean isObjectEmpty(Collection<?> pIn) {
+        return (pIn == null) || (pIn.size() == 0);
     }
 
     /**
      * Check if the specified Map is empty or not.
-     * @param in
+     *
+     * @param pIn
      * @return
      */
-    public static final boolean isObjectEmpty(final Map in) {
-        return (in == null) || (in.size() == 0);
+    public static boolean isObjectEmpty(Map<?, ?> pIn) {
+        return (pIn == null) || (pIn.size() == 0);
     }
 
     /**
      * Check if the specified Number is empty or not.
-     * @param in
+     *
+     * @param pIn
      * @return
      */
-    public static final boolean isObjectEmpty(final Number in) {
-        return in == null;
+    public static boolean isObjectEmpty(Number pIn) {
+        return pIn == null;
     }
 
     /**
      * Check if the specified Object is empty or not.
-     * @param in
+     *
+     * @param pIn
      *            The Object to validate.
      * @return True or False.
      */
-    public static final boolean isObjectEmpty(final Object in) {
+    public static boolean isObjectEmpty(Object pIn) {
         boolean res = false;
 
-        if (in == null) {
+        if (pIn == null) {
             res = true;
-        }
-        else {
-            if (in instanceof String) {
-                res = isObjectEmpty((String) in);
-            }
-            else if (in instanceof Map) {
-                res = isObjectEmpty((Map) in);
-            }
-            else if (in instanceof Collection) {
-                res = isObjectEmpty((Collection) in);
-            }
-            else if (in.getClass().isArray()) {
-                res = isObjectEmpty((Object[]) in);
+        } else {
+            if (pIn instanceof String) {
+                res = isObjectEmpty((String) pIn);
+            } else if (pIn instanceof Map) {
+                res = isObjectEmpty((Map<?, ?>) pIn);
+            } else if (pIn instanceof Collection) {
+                res = isObjectEmpty((Collection<?>) pIn);
+            } else if (pIn.getClass().isArray()) {
+                res = isObjectEmpty((Object[]) pIn);
             }
         }
 
@@ -72,33 +74,42 @@ public class ObjectUtils {
 
     /**
      * Check if the specified array of Object is empty or not.
-     * @param in
+     *
+     * @param pIn
      * @return
      */
-    public static final boolean isObjectEmpty(final Object[] in) {
-        return (in == null) || (in.length == 0);
+    public static boolean isObjectEmpty(Object[] pIn) {
+        return (pIn == null) || (pIn.length == 0);
     }
 
     /**
      * Check if the specified String is empty or not.
-     * @param str
+     *
+     * @param pIn
      * @return
      */
-    public static final boolean isObjectEmpty(final String str) {
-        final int strLen;
-        if ((str == null) || ((strLen = str.length()) == 0)) {
+    public static boolean isObjectEmpty(String pIn) {
+        int strLen;
+        if ((pIn == null) || ((strLen = pIn.length()) == 0)) {
             return true;
         }
 
         for (int i = 0; i < strLen; i++) {
-            if (!Character.isWhitespace(str.charAt(i))) {
+            if (!Character.isWhitespace(pIn.charAt(i))) {
                 return false;
             }
         }
         return true;
     }
 
-    public static boolean isTrue(Boolean b) {
-        return b != null && b;
+    /**
+     * Returns true if the specified Boolean is not null and is equal to
+     * Boolean.TRUE.
+     *
+     * @param pIn
+     * @return
+     */
+    public static boolean isTrue(Boolean pIn) {
+        return pIn != null && pIn;
     }
 }
