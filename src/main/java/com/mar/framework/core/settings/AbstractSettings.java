@@ -1,6 +1,7 @@
 package com.mar.framework.core.settings;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -46,10 +47,12 @@ public abstract class AbstractSettings {
 
             prop.store(output, null);
 
-        } catch (IOException ex) {
-            LogUtils.logError(AbstractSettings.class, "IOException while saving properties", ex);
-        } catch (URISyntaxException ex) {
-            LogUtils.logError(AbstractSettings.class, "URISyntaxException while saving properties", ex);
+        } catch (IOException e) {
+            LogUtils.logError(AbstractSettings.class, "IOException while saving properties", e);
+        } catch (URISyntaxException e) {
+            LogUtils.logError(AbstractSettings.class, "URISyntaxException while saving properties", e);
+        } catch (IllegalArgumentException e) {
+            LogUtils.logError(AbstractSettings.class, "IllegalArgumentException while saving properties", e);
         } finally {
             if (output != null) {
                 try {
@@ -62,7 +65,15 @@ public abstract class AbstractSettings {
     }
 
     public static void setValue(String pKey, boolean pValue) {
-        prop.put(pKey, pValue);
+        prop.put(pKey, Boolean.toString(pValue));
+    }
+
+    public static void setValue(String pKey, double pValue) {
+        prop.put(pKey, Double.toString(pValue));
+    }
+
+    public static void setValue(String pKey, int pValue) {
+        prop.put(pKey, Integer.toString(pValue));
     }
 
     public static void setValue(String pKey, String pValue) {
@@ -132,7 +143,7 @@ public abstract class AbstractSettings {
         try {
             n = Integer.parseInt(value);
         } catch (NumberFormatException e) {
-            LogUtils.logError(AbstractSettings.class,
+            LogUtils.logInfo(AbstractSettings.class,
                     "Impossible to parse [" + value + "] as integer. Using default value [" + n + "]");
         }
         return n;
@@ -166,31 +177,40 @@ public abstract class AbstractSettings {
         URL url = null;
 
         try {
-            input = AbstractSettings.class.getClassLoader().getResourceAsStream(filename);
-
-            if (input != null) {
-                url = AbstractSettings.class.getClassLoader().getResource(filename);
-                if (!isRunningFromJar()) {
-                    LogUtils.logInfo(AbstractSettings.class,
-                            "Property file [" + filename + "] found at URL [" + url.toString() + "]");
-                } else {
-                    LogUtils.logInfo(AbstractSettings.class,
-                            "Externalized property file [" + filename + "] found at URL [" + url.toString() + "]");
-                }
+            String filenameProp = System.getProperty("tmlproperty");
+            if (!ObjectUtils.isObjectEmpty(filenameProp)) {
+                filename = filenameProp;
+                File propFile = new File(filenameProp);
+                url = propFile.toURI().toURL();
+                input = new FileInputStream(propFile);
             } else {
-                if (!isRunningFromJar()) {
-                    LogUtils.logError(AbstractSettings.class, "Property file [" + filename + "] not found");
-                    return;
-                } else {
-                    input = AbstractSettings.class.getClassLoader().getResourceAsStream(filenameForJar);
+                input = AbstractSettings.class.getClassLoader().getResourceAsStream(filename);
 
-                    if (input != null) {
-                        url = AbstractSettings.class.getClassLoader().getResource(filenameForJar);
+                if (input != null) {
+                    url = AbstractSettings.class.getClassLoader().getResource(filename);
+                    if (!isRunningFromJar()) {
                         LogUtils.logInfo(AbstractSettings.class,
-                                "Property file [" + filenameForJar + "] found at URL [" + url.toString() + "]");
+                                "Property file [" + filename + "] found at URL [" + url.toString() + "]");
                     } else {
-                        LogUtils.logError(AbstractSettings.class, "Property file [" + filenameForJar + "] not found");
+                        LogUtils.logInfo(AbstractSettings.class,
+                                "Externalized property file [" + filename + "] found at URL [" + url.toString() + "]");
+                    }
+                } else {
+                    if (!isRunningFromJar()) {
+                        LogUtils.logError(AbstractSettings.class, "Property file [" + filename + "] not found");
                         return;
+                    } else {
+                        input = AbstractSettings.class.getClassLoader().getResourceAsStream(filenameForJar);
+
+                        if (input != null) {
+                            url = AbstractSettings.class.getClassLoader().getResource(filenameForJar);
+                            LogUtils.logInfo(AbstractSettings.class,
+                                    "Property file [" + filenameForJar + "] found at URL [" + url.toString() + "]");
+                        } else {
+                            LogUtils.logError(AbstractSettings.class,
+                                    "Property file [" + filenameForJar + "] not found");
+                            return;
+                        }
                     }
                 }
             }
